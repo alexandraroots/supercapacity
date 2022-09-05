@@ -1,15 +1,17 @@
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
+import logging
 
 
 def get_paper_url_from_doi(url):
     url = "https://sci-hub.ru/" + url
+    logging.warning(url)
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     html_page = urlopen(req).read()
     soup = BeautifulSoup(html_page, 'html.parser')
     div = soup.find(id="buttons")
     ref = div.button['onclick']
-    print(ref)
+
     ref = ref.split("='")[1].split("?")[0]
     if ref[1] == "/":  # Not on sci-hub <- основано на целых 3 ссылках
         return "https:" + ref
