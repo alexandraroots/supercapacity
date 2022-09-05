@@ -3,7 +3,7 @@ from urllib.request import Request, urlopen
 
 
 def get_paper_url_from_doi(url):
-    url = "https://sci-hub.ru" + url
+    url = "https://sci-hub.ru/" + url
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     html_page = urlopen(req).read()
     soup = BeautifulSoup(html_page, 'html.parser')
