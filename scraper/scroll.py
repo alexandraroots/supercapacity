@@ -5,10 +5,10 @@ SCROLL_PAUSE_TIME = 3.0
 PAGE_SIZE = 26000
 
 
-def scroll(driver, count):
+def scroll(driver, count, logger):
     i = 1
     while i < count:
-        logging.warning(f"Page {i} downloaded")
+        logger.warning(f"Page {i} downloaded")
         i += 1
         time.sleep(SCROLL_PAUSE_TIME)
         last_pixel = i * PAGE_SIZE
