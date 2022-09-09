@@ -3,6 +3,20 @@ from ml import simulated_annealing
 # from ml import simulated_annealing.
 import numpy as np
 
+BORDERS_PLOT = {
+    "Temperature_1": [80, 200],
+    "Time_1": [1, 24],
+    # "Velo": [1, 10],
+    "Temperature_2": [200, 500],
+    "Time_2": [1, 5],
+    "Volume_solvent": [10, 500],
+    "Density": [1, 70],
+    "Mass_Reagent_2": [1, 10000]
+    # "": ,
+}
+ORDER_INDEX = {"Temperature_1": 0, "Time_1": 1, "Temperature_2": 3,
+               "Time_2": 4, "Mass_Reagent_2": 5, "Volume_solvent": 6, "Density": 7}
+
 
 class Dummy:
     def __init__(self):
@@ -10,7 +24,7 @@ class Dummy:
         # self.values_fill_missing =  joblib.load(path_to_artifacts + "train_mode.joblib")
         # self.encoders = joblib.load(path_to_artifacts + "encoders.joblib")
         # self.model = joblib.load(path_to_artifacts + "random_forest.joblib")
-        self.model = lambda x: 12
+        self.model = lambda x: np.random.randint(900, 1200)
 
     def preprocessing(self, input_data):  # we will get data in expected format here
         # x = {'Temperature_1': [120, 160], 'Time_1': 12, 'Velocity': 2, 'Temperature_2': [350, 500], 'Time_2': 2,
@@ -19,22 +33,32 @@ class Dummy:
         #      'Mass_Reagent_1': 100,
         #      'Reagent_2': 'Co(NO3)2-6H2O', 'Measure_3': 'mmol', 'Mass_Reagent_2': 100, 'Volume_solvent': 70,
         #      'Density': 70}
+
+        order_params = ["Temperature_1", "Time_1", "Temperature_2",
+                        "Time_2",
+                        "Base", "Mass_Reagent_2", "Reagent_1",
+                        "Reagent_2", "Volume_solvent", "Density"]
         print(input_data)
         up_borders = []
         low_borders = []
         params = dict()
-        for key, val in input_data.items():
+        for key in order_params:
+            val = input_data[key]
             if type(val) is str:
                 params[key] = val
                 continue
             if type(val) is int:
-                low_borders.append(0)
+                # print("HERE")
+                low_borders.append(BORDERS_PLOT[key][0])
                 up_borders.append(val)
+                # print("HERE_1")
+
             else:
                 low_borders.append(val[0])
                 up_borders.append(val[1])
         # print(borders)
         print(params)
+        simulated_annealing.function_call.params = params
         borders = np.array([low_borders, up_borders])
         print(borders)
         return borders, params
@@ -42,7 +66,14 @@ class Dummy:
 
     def predict(self, input_data):
         # return self.model.predict_proba(input_data)
-        return 42
+
+        return 768
+
+    def model_rename(self, input_data):
+        input_data = [input_data["Temperature_1"], input_data["Time_1"], input_data["Temperature_2"],
+                      input_data["Time_2"], input_data["Mass_Reagent_2"], input_data["Volume_solvent"],
+                      input_data["Density"], input_data["Base"], input_data["Reagent_1"], input_data["Reagent_2"]]
+        return input_data
 
     def optimization(self, input_data):
         simulated_annealing.function_call.model = self.model
@@ -53,23 +84,66 @@ class Dummy:
         print("result", pos)
         return pos, simulated_annealing.function_call(pos)
 
-    def postprocessing(self, input_data):
-        params = ["Temperature_1", "Time_1", "Velocity", "Temperature_2", "Time_2", "Mass_Base", "Mass_Reagent_1",
-                  "Mass_Reagent_2",
-                  "Volume_solvent", "Density"]
-        label = "optimization"
+    def postprocessing(self, output_data, target):
+        params = ["Temperature_1", "Time_1", "Temperature_2",
+                  "Time_2", "Mass_Reagent_2", "Volume_solvent", "Density"]
         # if input_data > 0.5:
         #     label = ">no succ"
-        return {"parameters": {key: val for key, val in zip(params, input_data[0])}, "capacity": input_data[1],
-                "label": label, "status": "OK"}
+        if target == "predict":
+            label = "prediction"
+            response = {"capacity": output_data,
+                        "label": label, "status": "OK"}
+            # return
+        else:
+            label = "optimization"
+            response = {"parameters": {key: val for key, val in zip(params, output_data[0])},
+                        "capacity": output_data[1],
+                        "label": label, "status": "OK"}
+
+        return response
+
+    def plot_creator(self, response, input_data):
+        print("Here")
+
+        axis = input_data["Axis_x"]
+
+        print(axis)
+        dotes = 10
+        if input_data["target"] == "predict":
+            step = (BORDERS_PLOT[axis][1] - BORDERS_PLOT[axis][0]) / dotes
+            response["ax_x"] = [BORDERS_PLOT[axis][0] + i * step for i in range(dotes + 1)]
+            data = self.model_rename(input_data)
+
+        # response["ax_x"] = [i for i in range(50)]
+        else:
+            step = (input_data[axis][1] - input_data[axis][0]) / dotes
+            response["ax_x"] = [input_data[axis][0] + i * step for i in range(dotes + 1)]
+            data = self.model_rename(response["parameters"] | {"Base":simulated_annealing.function_call.params["Base"],
+                                                               "Reagent_1" :simulated_annealing.function_call.params["Reagent_1"],
+                                                               "Reagent_2":simulated_annealing.function_call.params["Reagent_2"]})
+        result = []
+        for x in response["ax_x"]:
+            data[ORDER_INDEX[axis]] = x
+            result.append(self.model(data))
+        response["ax_y"] = result
+        return response
 
     def compute_prediction(self, input_data):
         try:
-            borders, params = self.preprocessing(input_data)
-            # prediction = self.predict(input_data)[0]  # only one sample
-            # prediction = self.predict(input_data)  # only one sample
-            prediction = self.optimization(borders)  # only one sample
-            prediction = self.postprocessing(prediction)
+            target = input_data["target"]
+            if target == "predict":
+                reworked_data = self.model_rename(input_data)
+                prediction = self.predict(reworked_data)
+
+            else:
+                borders, params = self.preprocessing(input_data)
+                # prediction = self.predict(input_data)[0]  # only one sample
+                # prediction = self.predict(input_data)  # only one sample
+                prediction = self.optimization(borders)  # only one sample
+            prediction = self.postprocessing(prediction, target)
+
+            # prediction["ax_x"] = [i for i in range(50)]
+            prediction = self.plot_creator(prediction, input_data)
         except Exception as e:
             return {"status": "Error", "message": str(e)}
 

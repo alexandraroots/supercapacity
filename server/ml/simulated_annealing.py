@@ -79,7 +79,7 @@ def optimize(func, start, borders, break_after_calling=0):
                 return
 
             try:
-                if diff < 0 or random.random() < exp(-diff / (T + annealing_config.SAVING_DIVISION_EPSILON)):
+                if diff > 0 or random.random() < exp(-diff / (T + annealing_config.SAVING_DIVISION_EPSILON)):
                     position = neighbour
                     log_steps.append(position)
             except Exception as ex:
@@ -143,5 +143,14 @@ def np_cache(function):
 
 @np_cache
 def function_call(value_vector):
+    # print("hear_1")
+    # print(value_vector)
+    # print(function_call.params)
+    value_vector = value_vector.tolist()
+    value_vector.append(function_call.params["Base"])
+    value_vector.append(function_call.params["Reagent_1"])
+    value_vector.append(function_call.params["Reagent_2"])
+    # print("hear_2")
+
     return function_call.model(value_vector)
     # return parse_expr(function_call.expr, local_dict=vars_val)
