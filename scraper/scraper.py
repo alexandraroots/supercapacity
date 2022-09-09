@@ -19,8 +19,10 @@ if __name__ == "__main__":
     SCROLL_PAUSE_TIME = 2
 
     time.sleep(PAUSE_TIME)
-
-    scroll(driver, 100, logger)
+    try:
+        scroll(driver, 100, logger)
+    except:
+        logger.warning('End of scrolling')
     c = driver.page_source
     soup = BeautifulSoup(c, "html.parser")
 
@@ -30,23 +32,24 @@ if __name__ == "__main__":
     doi = []
     urls = []
     result = []
+    n = len(items)
     try:
         for i, (name, elem) in enumerate(zip(names, items)):
             name_text = name.find('span').text
-            logger.info(f'{i} page')
+            logger.info(f'{i} elem / {n}')
             full_elem = {}
             curr_doi = elem['data-doi']
             full_elem['doi'] = curr_doi
             full_elem['name'] = name_text
             full_elem['description'] = descriptions[i].find('span').text
             doi.append(curr_doi)
-            try:
-                full_url = get_paper_url_from_doi(curr_doi)
-                urls.append(full_url)
-                full_elem['url'] = full_url
-            except:
-                logger.warning(f'{curr_doi}')
-                full_elem['url'] = None
+            # try:
+            #     full_url = get_paper_url_from_doi(curr_doi)
+            #     urls.append(full_url)
+            #     full_elem['url'] = full_url
+            # except:
+            #     logger.warning(f'{curr_doi}')
+            #     full_elem['url'] = None
 
             result.append(full_elem)
     except:
