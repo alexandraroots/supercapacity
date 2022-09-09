@@ -24,7 +24,7 @@ try:
     # Random Forest classifier
     rf = Dummy()
     # add to ML registry
-    registry.add_algorithm(endpoint_name="dummy_model",
+    registry.add_algorithm(endpoint_name="smart_model",
                            algorithm_object=rf,
                            algorithm_name="dummy model",
                            algorithm_status="production",

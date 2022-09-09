@@ -1,7 +1,7 @@
 
 STARTING_TEMPERATURE = 6
 STOPPING_TEMPERATURE = 0.01
-ITERATION_PER_TEMPERATURE = 10
+ITERATION_PER_TEMPERATURE = 5
 
 CLOSEST_STEP = 0  # possible random step using length of variable interval
 FURTHER_STEP = 30
@@ -15,7 +15,7 @@ COOLING_SCHEDULE = "geom"  # possible types : linear, geom, log_1, log_2
 # log_2 is T = T/K
 
 linear_param = 0.2  # T_new = T_old - linear_param
-geom_param = 0.85  # T_new = T_old * geom_param
+geom_param = 0.35  # T_new = T_old * geom_param
 
 CHECKPOINT_FILE = "checkpoint.log"
 CHECKPOINT_EVERY_COOLING = 100

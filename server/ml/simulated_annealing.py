@@ -6,6 +6,7 @@ from math import exp
 from ml import annealing_config
 from functools import lru_cache, wraps
 
+
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         self.assertEqual(True, False)  # add assertion here
@@ -151,6 +152,8 @@ def function_call(value_vector):
     value_vector.append(function_call.params["Reagent_1"])
     value_vector.append(function_call.params["Reagent_2"])
     # print("hear_2")
-
-    return function_call.model(value_vector)
+    # print("here too")
+    res = function_call.model.predict(value_vector)
+    # print("calc", res)
+    return res
     # return parse_expr(function_call.expr, local_dict=vars_val)
