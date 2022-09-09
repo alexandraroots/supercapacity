@@ -12,9 +12,9 @@ class Model:
 
     def preproc(self, input):
         descriptors = []
-        for i in [4, 6, 7]:
-            descriptors.extend(morgan_fingerprint(mol_name_to_smiles(input[i])))
-        preproc_tmp = [input[0], input[1], input[2], input[3], input[5], input[8], input[9]]
+        for i in input[7:]:
+            descriptors.extend(morgan_fingerprint(mol_name_to_smiles(i)))
+        preproc_tmp = input[:7]
         preproc_tmp = dict(zip(['temperature_1', 'time_1', 'temperature_2', 'time_2',
                                 'm_salt_2', 'volume_solvent', 'density'], preproc_tmp))
         for i, d in enumerate(descriptors):
@@ -26,6 +26,6 @@ class Model:
 
 
 if __name__ == "__main__":
-    tmp = [100, 2, 350, 4, 'urea', 2, 'Nickel(II) nitrate hexahydrate', 'Nickel(II) nitrate hexahydrate', 20, 10]
+    tmp = [100, 2, 350, 4, 2, 20, 10, 'urea', 'Nickel(II) nitrate hexahydrate', 'Nickel(II) nitrate hexahydrate']
     model = Model()
     print(model.predict(tmp))
