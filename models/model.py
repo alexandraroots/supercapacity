@@ -1,4 +1,4 @@
-from helpers import *
+from helpers import morgan_fingerprint, mol_name_to_smiles
 import pickle
 import pandas as pd
 
