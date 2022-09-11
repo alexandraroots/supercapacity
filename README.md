@@ -28,6 +28,7 @@ Located supercapacity_api/view.py: algorithm_object = registry.endpoints[algs[le
   * Fix crutches created as a result of lack of time to study. An example would be model_name and model_rename_predict in ml.income_classifier.dummy_model.
   * Make the same logic work for prediction and optimization.
   * Refine the logic of working with the model.
+  * Meaningful messages and logs, error handling
 * Model:
   * Do not use pandas.
   * Add the ability to capture reagents, or remember reagents from previous calls (probably even the second, in the case of multiple requests to the server). Perhaps you should put the logic of requests to chemical services in a separate class.
@@ -37,6 +38,7 @@ Located supercapacity_api/view.py: algorithm_object = registry.endpoints[algs[le
 * Front:
   * It's beautiful :*
   * Stop randomizing the final structure.
+  * the server url is outdated, you need to host the server.
 * Future:
   * Host project on server.
   * Add additional training from the data in the table, after a certain period of time.
