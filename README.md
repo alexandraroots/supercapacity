@@ -42,5 +42,6 @@ Located supercapacity_api/view.py: algorithm_object = registry.endpoints[algs[le
 * Future:
   * Host project on server.
   * Add additional training from the data in the table, after a certain period of time.
-  * ???
+  * CI\CD 
+  * Tests
 
